@@ -1,4 +1,6 @@
-# STANDARD INCORPORATION DOCUMENT GENERATOR
+# Document Generator
+
+This is a document generator intended for use with the provided standard incorporation templates. However, the provided code in doc_gen.py is modular and can be applied to any other microsoft word template with the same placeholder structure.
 
 Instructions for usage:
 
