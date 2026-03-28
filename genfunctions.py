@@ -7,6 +7,7 @@ from typing import Any
 
 from doc_gen import Doc
 from doc_gen import template_path
+from conversion_script import fix_alias, load_data_from_csv
 
 def directors_resolutions(global_dict: dict, people: dict):
     path = template_path("Directors_ Resolutions", "initial directors resolution.docx")
@@ -141,82 +142,10 @@ def stock_purchase_agreement(global_dict: dict, people: dict):
 
 
 if __name__ == '__main__':
-    # The Global Dictionary for company-wide constants
-    global_dict = {
-        '[INCDATE]': 'January 15, 2026',
-        '[DATE]': 'January 15, 2026',
-        '[COMPANY]': 'Nexus Tech Solutions, Inc.',
-        '[CORP]': 'Nexus Tech Solutions, Inc.',
-        '[CEO]': 'Sarah Chen',
-        '[PRES]': 'Sarah Chen',
-        '[CFO]': 'Marcus Thorne',
-        '[SECRETARY]': 'Elena Rodriguez',
-        '[CLINE1]': '123 Innovation Way',
-        '[CLINE2]': 'San Francisco, CA 94105',
-        '[REGNAME]': 'Registered Agents Inc.',
-        '[REGADD]': '456 Business Park Dr, Suite 10, San Francisco, CA 94105',
-        '[AUTHTOTAL]': '10,000,000'
-    }
+    global_csv_path = Path(__file__).parent / "input" / "global_data.csv"
+    people_csv_path = Path(__file__).parent / "input" / "people.csv"
+    global_dict, people = load_data_from_csv(global_csv_path, people_csv_path)
 
-    # The People Dictionary for individual-specific data
-    people = {
-        'directors': {
-            'Sarah Chen': {
-                '[DIRECTOR]': 'Sarah Chen',
-                '[INDEMNITEE]': 'Sarah Chen',
-                '[ILINE1]': '123 Innovation Way',
-                '[ILINE2]': 'San Francisco, CA 94105'
-            },
-            'Marcus Thorne': {
-                '[DIRECTOR]': 'Marcus Thorne',
-                '[INDEMNITEE]': 'Marcus Thorne',
-                '[ILINE1]': '789 Oak Lane',
-                '[ILINE2]': 'Palo Alto, CA 94301'
-            }
-        },
-        'shareholders': {
-            'Sarah Chen': {
-                '[BUYER]': 'Sarah Chen',
-                '[COUNT]': '5,000,000',
-                '[PRICE]': '500.00',
-                '[BLINE1]': '123 Innovation Way',
-                '[BLINE2]': 'San Francisco, CA 94105',
-                '[BEMAIL]': 'sarah@nexustech.io'
-            },
-            'Venture Core Partners': {
-                '[BUYER]': 'Venture Core Partners, LP',
-                '[COUNT]': '1,000,000',
-                '[PRICE]': '100.00',
-                '[BLINE1]': '500 Market St',
-                '[BLINE2]': 'San Francisco, CA 94104',
-                '[BEMAIL]': 'admin@venturecore.com'
-            }
-        },
-        'officers': {
-            'Elena Rodriguez': {
-                '[INDEMNITEE]': 'Elena Rodriguez',
-                '[ILINE1]': '101 Pine Street',
-                '[ILINE2]': 'Oakland, CA 94607'
-            }
-        },
-        'ip': {
-            'Sarah Chen': {
-                '[ASSIGNOR]': 'Sarah Chen',
-                'item_list': [
-                    'Proprietary cloud computing architecture',
-                    'Distributed ledger synchronization algorithm',
-                    'User interface design patterns for Nexus v1.0'
-                ]
-            },
-            'Marcus Thorne': {
-                '[ASSIGNOR]': 'Marcus Thorne',
-                'item_list': [
-                    'Mobile application source code',
-                    'API documentation and integration protocols'
-                ]
-            }
-        }
-    }
     directors_resolutions(global_dict, people)
     indemnification_agreement(global_dict, people)
     bylaws(global_dict, people)
