@@ -19,6 +19,8 @@ Note that the information must be written in the exact same format as the exampl
 
 2.4) if the item_list field is applicable (that is, the person is assigning intellectual property), write it out in semicolon-separated format, in the exact same manner as provided in the example file.
 
+2.5) if more than one person is a member of the company, enter the other members' information immediately under the information of the first row in the same manner described above. DO NOT add new columns.
+
 3) Run genfunctions.py -> an output folder will appear with the specific corporation's details. This folder will contain all the generated documents for this particular company.
 
 (i.e. output Big Corp Inc.)
