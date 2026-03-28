@@ -10,7 +10,7 @@ class Doc:
     """Representation of a generic document.
     """
     
-    def __init__(self, name: str, globaldict: dict, peopledict: dict, settingsdict={'cert_start': 1} ) -> None:
+    def __init__(self, name: str, globaldict: dict, peopledict: dict, settingsdict={} ) -> None:
         #people comes in the form of {'directors': {sam: {name, address, etc}}, 'shareholders': {eric: name, address, etc}, 'officers': {jacob: name, address, etc}, 'ip': {jackson: name, address, etc}}
         self.doc = Document(name)
         self.globaldict = globaldict
@@ -187,9 +187,9 @@ class Doc:
             nparalist[j].add_run(str(item_list[j]))
         self._delete_paragraph(p)
 
-    def save_doc(self, folder, savename) -> None:
+    def save_doc(self, folder, savename, company_name) -> None:
         main_path = Path(__file__).parent
-        output_dir = main_path / "output" / folder
+        output_dir = main_path / ("output " + company_name) / folder
         output_dir.mkdir(parents=True, exist_ok=True)
         self.doc.save(output_dir / savename)
     

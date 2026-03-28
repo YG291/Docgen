@@ -23,7 +23,7 @@ def directors_resolutions(global_dict: dict, people: dict):
                 doc._replace_p(p, people['shareholders'][person], '[PRICE]')
     doc.remove_row(sale_table, 1)
     doc.fill_signatures(people['directors'])
-    doc.save_doc("Directors_ Resolutions", "initial directors resolution.docx")
+    doc.save_doc("Directors_ Resolutions", "initial directors resolution.docx", global_dict['[CORP]'])
 
 def indemnification_agreement(global_dict: dict, people: dict):
     for person in people['directors']:
@@ -33,7 +33,7 @@ def indemnification_agreement(global_dict: dict, people: dict):
         doc.replace_tables(global_dict)
         doc.replace_tables(people['directors'][person])
         doc.replace_main(people['directors'][person])
-        doc.save_doc("Indemnification", "indemnification "+person+" .docx")
+        doc.save_doc("Indemnification", "indemnification "+person+" .docx", global_dict['[CORP]'])
     
     for person in people['officers']:
         path = template_path("Indemnification", "indemnification agreement.docx")
@@ -42,24 +42,24 @@ def indemnification_agreement(global_dict: dict, people: dict):
         doc.replace_main(people['officers'][person])
         doc.replace_tables(global_dict)
         doc.replace_tables(people['officers'][person])
-        doc.save_doc("Indemnification", "indemnification "+person+" .docx")
+        doc.save_doc("Indemnification", "indemnification "+person+" .docx", global_dict['[CORP]'])
 
 def bylaws(global_dict: dict, people: dict):
     path = template_path("By-Laws", "bylaws.docx")
     doc = Doc(path, global_dict, people)
     doc.replace_main(global_dict)
-    doc.save_doc("By-Laws", "bylaws.docx")
+    doc.save_doc("By-Laws", "bylaws.docx", global_dict['[CORP]'])
 
     path = template_path("By-Laws", "certificate of secretary.docx")
     doc = Doc(path, global_dict, people)
     doc.replace_main(global_dict)
     doc.replace_tables(global_dict)
-    doc.save_doc("By-Laws", "certificate of secretary.docx")
+    doc.save_doc("By-Laws", "certificate of secretary.docx", global_dict['[CORP]'])
 
     path = template_path("By-Laws", "incorporation certificate.docx")
     doc = Doc(path, global_dict, people)
     doc.replace_main(global_dict)
-    doc.save_doc("By-Laws", "incorporation certificate.docx")
+    doc.save_doc("By-Laws", "incorporation certificate.docx", global_dict['[CORP]'])
 
 def ipassignment(global_dict: dict, people: dict):
     path = template_path("IP Assignments", "ip assignment.docx")
@@ -73,7 +73,7 @@ def ipassignment(global_dict: dict, people: dict):
         doc.replace_tables(global_dict)
         p = doc.doc.paragraphs[len(doc.doc.paragraphs)-1]
         doc.dot_jots(p, people['ip'][person]['item_list'])
-        doc.save_doc("IP Assignments", "ip assignment "+person+" .docx")
+        doc.save_doc("IP Assignments", "ip assignment "+person+" .docx", global_dict['[CORP]'])
 
 def jointescrow(global_dict: dict, people: dict):
      path = template_path("Joint Escrow Instructions", "joint escrow instructions.docx")
@@ -85,7 +85,7 @@ def jointescrow(global_dict: dict, people: dict):
         doc.replace_main(people['shareholders'][person])
         doc.replace_tables(people['shareholders'][person])
         doc.replace_tables(global_dict)
-        doc.save_doc("Joint Escrow Instructions", "joint escrow "+person+" .docx")
+        doc.save_doc("Joint Escrow Instructions", "joint escrow "+person+" .docx", global_dict['[CORP]'])
 
 def restrictedpurchase(global_dict: dict, people: dict):
     path = template_path("Restricted Stock Purchase", "restricted stock purchase agreement.docx")
@@ -97,7 +97,7 @@ def restrictedpurchase(global_dict: dict, people: dict):
         doc.replace_main(people['shareholders'][person])
         doc.replace_tables(people['shareholders'][person])
         doc.replace_tables(global_dict)
-        doc.save_doc("Restricted Stock Purchase", "restricted stock purchase "+person+" .docx")
+        doc.save_doc("Restricted Stock Purchase", "restricted stock purchase "+person+" .docx", global_dict['[CORP]'])
 
 def stock_assignment(global_dict: dict, people: dict):
     path = template_path("Restricted Stock Purchase", "stock assignment.docx")
@@ -107,7 +107,7 @@ def stock_assignment(global_dict: dict, people: dict):
         doc.replace_main(people['shareholders'][person])
         doc.replace_tables(people['shareholders'][person])
         doc.replace_tables(global_dict)
-        doc.save_doc("Restricted Stock Purchase", "stock assignment "+person+" .docx")
+        doc.save_doc("Restricted Stock Purchase", "stock assignment "+person+" .docx", global_dict['[CORP]'])
 
 def shareholder_resolution(global_dict: dict, people: dict):
     path = template_path("Shareholders_ Resolutions", "shareholders resolutions.docx")
@@ -115,7 +115,7 @@ def shareholder_resolution(global_dict: dict, people: dict):
     doc.replace_main(global_dict)
     doc.fill_signatures(people['shareholders'])
     doc.replace_tables(global_dict)
-    doc.save_doc("Shareholders_ Resolutions", "shareholders resolutions.docx")
+    doc.save_doc("Shareholders_ Resolutions", "shareholders resolutions.docx", global_dict['[CORP]'])
 
 def stock_certificates(global_dict: dict, people: dict):
     counter = 1
@@ -127,7 +127,7 @@ def stock_certificates(global_dict: dict, people: dict):
         doc.replace_tables(people['shareholders'][person])
         doc.replace_tables(global_dict)
         doc.replace_tables({'[CERTNUM]': str(counter)})
-        doc.save_doc("Stock Certificates", "stock certificate "+person+" .docx")
+        doc.save_doc("Stock Certificates", "stock certificate "+person+" .docx", global_dict['[CORP]'])
         counter += 1
 
 def stock_purchase_agreement(global_dict: dict, people: dict):
@@ -138,7 +138,7 @@ def stock_purchase_agreement(global_dict: dict, people: dict):
         doc.replace_main(people['shareholders'][person])
         doc.replace_tables(people['shareholders'][person])
         doc.replace_tables(global_dict)
-        doc.save_doc("Stock Purchase Agreement", "stock purchase agreement "+person+" .docx")
+        doc.save_doc("Stock Purchase Agreement", "stock purchase agreement "+person+" .docx", global_dict['[CORP]'])
 
 
 if __name__ == '__main__':
