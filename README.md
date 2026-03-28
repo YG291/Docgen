@@ -1,4 +1,4 @@
-# Docgen
+# STANDARD INCORPORATION DOCUMENT GENERATOR
 
 Instructions for usage:
 
