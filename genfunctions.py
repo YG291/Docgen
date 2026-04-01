@@ -108,57 +108,58 @@ def stock_assignment(global_dict: dict, people: dict):
         doc.replace_tables(people['shareholders'][person])
         doc.replace_tables(global_dict)
         doc.save_doc("Restricted Stock Purchase", "stock assignment "+person+" .docx", global_dict['[CORP]'])
-
-import copy
-from docx.table import Table
-
 def shareholder_resolution(global_dict: dict, people: dict):
     path = template_path("Shareholders_ Resolutions", "shareholders resolutions.docx")
     doc = Doc(path, global_dict, people)
     
-    # 1. Replace headers, footers, and main body text globally
-    doc.replace_hf(global_dict)
+    # 1. Body/Header replacements
     doc.replace_main(global_dict)
+    doc.replace_hf(global_dict) 
 
-    # 2. Find the template table
+    # 2. Find the table
     template_table = doc.find_table_by_text('[BUYER]')
     
     if template_table:
+        import copy
+        from docx.table import Table
+        
         for person_name in people['shareholders']:
-            # THE CLONE: Copy the entire table XML
             new_xml = copy.deepcopy(template_table._element)
             template_table._element.addnext(new_xml)
             new_table = Table(new_xml, doc.doc)
             
-            # 3. Data Mapping: Merge person info with global info for this block
-            # This ensures we have [BUYER] AND [INCDATE] available for every table
             p_data = people['shareholders'][person_name].copy()
             p_data['[BUYER]'] = person_name
             p_data['[SHAREHOLDER]'] = person_name
             p_data['[STOCKHOLDER]'] = person_name
-            
-            # 4. SURGICAL REPLACEMENT: Cell by Cell
+
             for row in new_table.rows:
                 for cell in row.cells:
                     for p in cell.paragraphs:
-                        # Check for Person-Specific Tags
+                        # Force refresh the paragraph text check
+                        p_text = p.text
+                        
+                        # A. Individual Shareholder Tags
                         for tag in ['[BUYER]', '[SHAREHOLDER]', '[STOCKHOLDER]', '[COUNT]', '[PRICE]']:
-                            if tag in p.text and tag in p_data:
+                            if tag in p_text:
                                 doc._replace_p(p, p_data, tag)
                         
-                        # Check for Global/Corporate Tags (like [INCDATE], [DATE], [CORP])
-                        for g_tag in global_dict:
+                        # B. Global Tags (The [incdate] fix)
+                        # We iterate through everything in your CSV data
+                        for g_tag, g_val in global_dict.items():
                             if g_tag in p.text:
                                 doc._replace_p(p, global_dict, g_tag)
+                            # Safety: Check for uppercase version if the tag is lowercase
+                            elif g_tag.upper() in p.text:
+                                # Temporarily add the upper version to the dict so _replace_p finds it
+                                temp_dict = {g_tag.upper(): g_val}
+                                doc._replace_p(p, temp_dict, g_tag.upper())
 
-        # 5. CLEANUP: Kill the placeholder table after N copies are made
         doc._remove_table(template_table)
         
     else:
-        # Emergency fallback
         doc.fill_signatures(people['shareholders'])
 
-    # 6. Save using the Corporate Name
     doc.save_doc("Shareholders_ Resolutions", "shareholders resolutions.docx", global_dict['[CORP]'])
 
 def stock_certificates(global_dict: dict, people: dict):
