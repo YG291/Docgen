@@ -1,10 +1,14 @@
+from __future__ import annotations
 from docx import Document
 from docx.text.run import Run
 from docx.text.paragraph import Paragraph
 from docx.table import Table
 from pathlib import Path
-
-from typing import Any
+import googleapiclient.discovery
+import googleapiclient.http
+from google.oauth2.credentials import Credentials
+from google.auth.transport.requests import Request
+import os
 
 class Doc:
     """Representation of a generic document.
@@ -186,12 +190,50 @@ class Doc:
         for j in range(len(item_list)):
             nparalist[j].add_run(str(item_list[j]))
         self._delete_paragraph(p)
+            
+    def upload_to_drive(self, file_path, file_name, company_name, subfolder_name):
+        import os
+        import googleapiclient.discovery
+        import googleapiclient.http
+        from google.oauth2.credentials import Credentials
+        
+        creds = Credentials(
+            token=None,
+            refresh_token=os.environ.get('GOOGLE_REFRESH_TOKEN'),
+            token_uri="https://oauth2.googleapis.com/token",
+            client_id=os.environ.get('GOOGLE_CLIENT_ID'),
+            client_secret=os.environ.get('GOOGLE_CLIENT_SECRET')
+        )
+        service = googleapiclient.discovery.build('drive', 'v3', credentials=creds)
+        parent_id = os.environ.get('PARENT_FOLDER_ID')
+
+        # 1. Company Folder (Clean name to stop duplicates)
+        c_name = company_name.strip()
+        q = f"name='{c_name}' and '{parent_id}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false"
+        res = service.files().list(q=q).execute().get('files', [])
+        f_id = res[0]['id'] if res else service.files().create(body={'name': c_name, 'mimeType': 'application/vnd.google-apps.folder', 'parents': [parent_id]}, fields='id').execute().get('id')
+
+        # 2. Subfolder (Clean name)
+        s_name = subfolder_name.strip()
+        sq = f"name='{s_name}' and '{f_id}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false"
+        sres = service.files().list(q=sq).execute().get('files', [])
+        t_id = sres[0]['id'] if sres else service.files().create(body={'name': s_name, 'mimeType': 'application/vnd.google-apps.folder', 'parents': [f_id]}, fields='id').execute().get('id')
+
+        # 3. File (Overwrite if exists)
+        fq = f"name='{file_name}' and '{t_id}' in parents and trashed=false"
+        efiles = service.files().list(q=fq).execute().get('files', [])
+        media = googleapiclient.http.MediaFileUpload(file_path, resumable=True)
+        
+        if efiles:
+            service.files().update(fileId=efiles[0]['id'], media_body=media).execute()
+        else:
+            service.files().create(body={'name': file_name, 'parents': [t_id]}, media_body=media).execute()
 
     def save_doc(self, folder, savename, company_name) -> None:
-        main_path = Path(__file__).parent
-        output_dir = main_path / ("output " + company_name) / folder
-        output_dir.mkdir(parents=True, exist_ok=True)
-        self.doc.save(output_dir / savename)
+        temp_path = f'/tmp/{savename}'
+        self.doc.save(temp_path)
+        # Apply the fix: Use the subfolder name correctly
+        self.upload_to_drive(temp_path, savename, company_name, folder)
     
 def template_path(folder: str, file: str) -> Path:
     main_path = Path(__file__).parent
